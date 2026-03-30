@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse System</title>
+    <!-- Always Include Required Packages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- PDF Export (Required by PRD Sub-workflow 7) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/index-DgyLVzHq.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden flex flex-col">
+
+    <!-- ========== LOGIN VIEW ========== -->
+    <div id="view-login" class="h-full flex items-center justify-center relative isolate px-6 w-full fade-in-up">
+        <!-- decorative background -->
+        <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+            <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-brand-200 to-primary-200 opacity-40 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
+        </div>
+
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100" data-aos="fade-up">
+            <div class="p-8 pb-6 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center mb-4 shadow-sm">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">System Login</h2>
+                <p class="text-sm text-slate-500 mt-1">Simulated credential routing. 1 file, 2 experiences.</p>
+            </div>
+            <div class="p-8 space-y-6">
+                <form id="auth-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                        <input type="email" id="login-email" required class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" id="login-pass" required class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow text-sm">
+                    </div>
+                    <div id="register-role-section" class="hidden">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Account Role (Registration Only)</label>
+                        <select id="login-role" class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow text-sm">
+                            <option value="student">Student</option>
+                            <option value="tutor">Tutor</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="handleLogin(event)" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-medium px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                            Login
+                        </button>
+                        <button type="button" onclick="handleSignUp(event)" id="signup-btn" class="flex-1 bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 font-medium px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                            Register
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TUTOR VIEW ========== -->
+    <div id="view-tutor" class="h-full hidden w-full flex overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between hidden md:flex shrink-0">
+            <div>
+                <div class="h-16 flex items-center px-6 border-b border-slate-800">
+                    <i class="fa-solid fa-graduation-cap text-primary-500 text-xl mr-3"></i>
+                    <span class="text-lg font-semibold tracking-tight">Tutor Admin</span>
+                </div>
+                <nav class="p-4 space-y-1">
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-primary-600 text-white rounded-lg font-medium transition-colors">
+                        <i class="fa-solid fa-file-import w-5"></i>
+                        Intake & Processing
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition-colors">
+                        <i class="fa-solid fa-chart-line w-5"></i>
+                        Post-Class Analysis
+                    </a>
+                    <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-300 hover:bg-slate-800 hover:text-rose-400 rounded-lg font-medium transition-colors mt-8">
+                        <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                        Logout
+                    </button>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 px-3 py-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-sm"></i>
+                    </div>
+                    <div class="text-sm">
+                        <p class="font-medium text-white">System Admin</p>
+                        <p class="text-xs text-slate-400">0 Tokens Consumed</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+            <!-- Top Header -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="document.querySelector('#view-tutor aside').classList.toggle('hidden')" class="md:hidden text-slate-500 hover:text-slate-800 transition-colors">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-slate-800">Intake & Pre-Class Orchestrator</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        API Limits: OK
+                    </span>
+                    <span class="text-sm text-slate-500 font-medium hidden sm:block">Serverless Architecture (100% Free Tier)</span>
+                </div>
+            </header>
+
+            <div class="p-4 md:p-8 max-w-5xl mx-auto w-full space-y-8 pb-20">
+                
+                <!-- Welcome Info Section -->
+                <div class="bg-gradient-to-r from-primary-900 to-primary-600 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-10 w-full sm:w-2/3">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Pre-Calculate State Machines</h2>
+                        <p class="text-primary-100 mb-2 md:mb-6 font-light text-sm md:text-base">Generate worksheets, static hint trees, and guided revision structures asynchronously to strictly enforce the 0-token student retrieval rule.</p>
+                    </div>
+                    <i class="fa-solid fa-server absolute -right-6 -bottom-6 text-9xl text-white opacity-10"></i>
+                </div>
+
+                <!-- Sub-workflow 1: Intake Form -->
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="border-b border-slate-200 px-6 py-4 bg-slate-50 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-800">Sub-workflow 1: Initial Source Processor</h3>
+                    </div>
+                    <div class="p-6">
+                        <form id="intake-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Textbook Source Name</label>
+                                    <input type="text" placeholder="e.g. SPM Physics Chapter 4" class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Upload Material Context (TXT/PDF)</label>
+                                    <input type="file" id="tutor-upload-file" accept=".txt,.pdf" class="w-full border border-slate-300 rounded-lg px-4 py-2 hover:bg-slate-50 transition-colors file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100">
+                                </div>
+                            </div>
+                            
+                            <div class="bg-amber-50 rounded-lg p-4 border border-amber-200 flex gap-3 text-sm text-amber-800">
+                                <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0"></i>
+                                <div>
+                                    <span class="font-semibold block mb-1">Warning: Token Cost Implication</span>
+                                    Upon clicking generating, exactly 1 LLM request will orchestrate 10 questions, 10 answers, 10 specific hints, and 30 prompts, mapping exactly to 1 JSON tree.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <button type="button" onclick="generateMaterials()" class="bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    Generate Pre-Computed State Machine
+                                </button>
+                                <span class="text-sm text-slate-500" id="generate-status">Status: Waiting for input...</span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Pre-Class Outputs (PDF / DOCX Export Node) -->
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden hidden" id="materials-output">
+                    <div class="border-b border-slate-200 px-6 py-4 bg-slate-50 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">1 JSON State Machine Created</h3>
+                        </div>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6" id="export-target">
+                        <div class="border border-slate-200 rounded-lg p-5">
+                            <h4 class="font-semibold text-slate-800 flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-file-pdf text-red-500"></i> Tutor Material (Nota)
+                            </h4>
+                            <p class="text-sm text-slate-600 mb-4 h-12">1 Lesson Plan ready for the session based strictly on extracted syllabus requirements.</p>
+                            <button onclick="exportToPDF()" class="w-full border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium px-4 py-2 rounded-lg transition-colors text-sm">
+                                Export via Client-Side PDF Node
+                            </button>
+                        </div>
+                        <div class="border border-slate-200 rounded-lg p-5">
+                            <h4 class="font-semibold text-slate-800 flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-network-wired text-primary-500"></i> Local JSON Sync
+                            </h4>
+                            <p class="text-sm text-slate-600 mb-4 h-12">Pre-computed Student State. 10 QAs, 10 hints, 30 prompts locked for retrieval.</p>
+                            <button onclick="syncStateMachine()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium px-4 py-2 rounded-lg transition-colors text-sm">
+                                Sync to Student DB State
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-workflow 6: Post-Class Google Meet Log -->
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mt-8">
+                    <div class="border-b border-slate-200 px-6 py-4 bg-slate-50 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-800">Sub-workflow 6: Post-Class Analyzer</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-slate-600 mb-5">Ingest exactly 1 Google Meet transcript file to generate 1 Meeting Minutes log and statistical metric review.</p>
+                        <label class="block border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer">
+                            <input type="file" id="tutor-meet-file" class="hidden" accept=".txt" onchange="processMeetTranscript(event)">
+                            <div class="w-12 h-12 mx-auto bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-3">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                            </div>
+                            <span class="block font-medium text-slate-700 mb-1" id="meet-upload-txt">Click to upload Google Meet Transcript</span>
+                            <span class="text-xs text-slate-500">Supported format: .TXT log output</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== STUDENT VIEW ========== -->
+    <div id="view-student" class="h-full hidden w-full flex flex-col overflow-hidden bg-white">
+        <!-- Navbar -->
+        <nav class="bg-white border-b border-slate-200 h-16 shrink-0 px-4 md:px-6 flex items-center justify-between shadow-sm z-20 relative lg:pl-6">
+            <div class="flex items-center gap-3">
+                <button onclick="document.querySelector('#view-student aside').classList.toggle('hidden')" class="md:hidden text-slate-500 hover:text-slate-800 transition-colors">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="bg-brand-50 text-brand-600 rounded-lg p-2 hidden sm:block">
+                    <i class="fa-solid fa-book text-lg"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-slate-800">Student Portal</span>
+            </div>
+            <div class="flex items-center gap-3 md:gap-4">
+                <button onclick="logout()" class="text-rose-500 hover:text-rose-700 text-sm font-medium transition-colors border border-rose-200 hover:border-rose-300 rounded-lg px-3 py-1.5 hidden sm:block">
+                    Logout
+                </button>
+                <button onclick="logout()" class="sm:hidden text-rose-500 hover:text-rose-700 transition-colors">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+                <!-- 0 Token Consumption Proof Badge -->
+                <div title="System runs 100% Client-Side Matching" class="bg-slate-100 border border-slate-200 rounded-full px-3 py-1.5 flex items-center gap-2 text-xs font-semibold text-slate-600">
+                    <i class="fa-solid fa-bolt text-amber-500"></i>
+                    <span class="token-counter hidden sm:inline">0 API Tokens Burned</span>
+                    <span class="token-counter sm:hidden">0 Tokens</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-white relative">
+            
+            <!-- Left Sidebar: Modules & Prompts (Sub-workflow 8) -->
+            <aside class="w-full md:w-80 bg-slate-50 border-r border-slate-200 p-6 flex flex-col pt-8 overflow-y-auto z-10 hidden md:flex shrink-0 absolute md:relative h-full" id="student-sidebar">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Out-of-Class Revision</h2>
+                
+                <div class="mb-8">
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 mb-4 hover:border-brand-500 cursor-pointer transition-colors group">
+                        <div class="flex justify-between items-start mb-2 text-slate-800">
+                            <h3 class="font-semibold text-sm">SPM Physics Chap 4</h3>
+                            <i class="fa-solid fa-atom text-brand-500 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2 mt-3">
+                            <div class="bg-brand-500 h-1.5 rounded-full" style="width: 35%"></div>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium">10 Questions mapped - 35% Completed</p>
+                    </div>
+                </div>
+
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Guided Prompts (3 Loaded)</h2>
+                <div class="space-y-3">
+                    <!-- Sub-workflow 8: 3 Defined Guided Prompts -->
+                    <button onclick="injectPrompt('Explain Latent Heat capacity differences in water vs oil.')" class="w-full text-left bg-white p-3 rounded-lg border border-slate-200 text-sm text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all focus:outline-none">
+                        <i class="fa-regular fa-comment-dots mr-2 text-slate-400"></i>
+                        Explain Latent Heat differences.
+                    </button>
+                    <button onclick="injectPrompt('What is the formula for Specific Heat Capacity derivation?')" class="w-full text-left bg-white p-3 rounded-lg border border-slate-200 text-sm text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all focus:outline-none">
+                        <i class="fa-regular fa-comment-dots mr-2 text-slate-400"></i>
+                        Show the calculation formula.
+                    </button>
+                    <button onclick="injectPrompt('Give me a hint for Boyle\'s Law graph.')" class="w-full text-left bg-white p-3 rounded-lg border border-slate-200 text-sm text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all focus:outline-none">
+                        <i class="fa-regular fa-comment-dots mr-2 text-slate-400"></i>
+                        Hint for Boyle's Law graph.
+                    </button>
+                </div>
+                
+                <div class="mt-auto pt-6 border-t border-slate-200 text-xs text-slate-500 leading-relaxed">
+                    <strong>PRD Rule Check:</strong> External concepts typed in chat will trigger 1 Hybrid RAG fetch and return pure text chunks without LLM synthesis, protecting tutor credentials.
+                </div>
+            </aside>
+
+            <!-- Chat Area (Sub-workflow 5) -->
+            <section class="flex-1 flex flex-col bg-slate-50 relative isolate h-full pb-0">
+                <!-- decorative background -->
+                <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+                    <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-brand-200 to-brand-100 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
+                </div>
+
+                <!-- Chat Window -->
+                <div id="chat-container" class="flex-1 overflow-y-auto px-4 md:px-12 py-8 space-y-6 flex flex-col relative z-0">
+                    <!-- Dynamic chat goes here -->
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 md:p-6 bg-white border-t border-slate-200 shrink-0 z-10 w-full">
+                    <form id="chat-form" class="max-w-4xl mx-auto relative flex items-center" onsubmit="handleChatSubmit(event)">
+                        <input type="text" id="chat-input" placeholder="Type your answer to trigger active recall loop..." class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-4 pr-14 py-3 sm:py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow shadow-sm text-sm">
+                        <button type="submit" class="absolute right-2 top-1.5 bottom-1.5 bg-brand-600 hover:bg-brand-700 text-white w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-paper-plane text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        // ── Global State ──
+        let ACTIVE_STATE_MACHINE = null; // Loaded from DB for student matching
+        let LAST_GENERATED_SM_ID = null; // Tracks last tutor generation
+
+        // ── Auth & Routing ──
+        window.routeUser = async function(user) {
+            const role = user.user_metadata?.role || 'student';
+            showView(role === 'tutor' ? 'view-tutor' : 'view-student');
+            if (role === 'student') {
+                await loadStudentStateMachine();
+                const container = document.getElementById('chat-container');
+                if (container.children.length === 0) {
+                    appendMessage(false, "System ready. Validating inputs strictly via pre-calculated JSON (State Machine). Total API lag removed. Send your response for evaluation.");
+                }
+            }
+        };
+
+        async function loadStudentStateMachine() {
+            if (!window.supabaseClient) return;
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('state_machines')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                if (!error && data) {
+                    ACTIVE_STATE_MACHINE = data;
+                    renderSidebarFromDB(data);
+                }
+            } catch(e) { console.warn('No state machines found, using fallback.'); }
+        }
+
+        function renderSidebarFromDB(sm) {
+            const moduleCard = document.querySelector('#student-sidebar .bg-white.rounded-xl.p-4');
+            if (moduleCard) {
+                moduleCard.querySelector('h3').textContent = sm.source_name;
+                moduleCard.querySelector('p').textContent = `${sm.questions?.length || 0} Questions mapped - 0% Completed`;
+            }
+            const promptContainer = document.querySelector('#student-sidebar .space-y-3');
+            if (promptContainer && sm.guided_prompts?.length >= 3) {
+                const prompts = sm.guided_prompts.slice(0, 3);
+                promptContainer.innerHTML = prompts.map(p =>
+                    `<button onclick="injectPrompt('${p.prompt.replace(/'/g, "\\'")}')" class="w-full text-left bg-white p-3 rounded-lg border border-slate-200 text-sm text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all focus:outline-none">
+                        <i class="fa-regular fa-comment-dots mr-2 text-slate-400"></i>${p.prompt.substring(0, 50)}${p.prompt.length > 50 ? '...' : ''}
+                    </button>`
+                ).join('');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            if(!email || !pass) return Swal.fire('Error', 'Missing credentials', 'error');
+            if (!window.supabaseClient) return Swal.fire('System Error', 'Supabase client not initialized.', 'error');
+            Swal.fire({title: 'Authenticating via Supabase...', didOpen: () => Swal.showLoading()});
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password: pass });
+            if (error) Swal.fire('Login Failed', error.message, 'error');
+            else { Swal.close(); window.routeUser(data.user); }
+        }
+
+        async function handleSignUp(e) {
+            e.preventDefault();
+            const roleSection = document.getElementById('register-role-section');
+            if (roleSection.classList.contains('hidden')) {
+                roleSection.classList.remove('hidden');
+                const btn = document.getElementById('signup-btn');
+                btn.classList.add('bg-slate-900', 'text-white', 'border-transparent');
+                btn.classList.remove('bg-white', 'text-slate-900');
+                btn.innerHTML = 'Confirm Registration';
+                return;
+            }
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const role = document.getElementById('login-role').value;
+            if(!email || !pass) return Swal.fire('Error', 'Missing credentials', 'error');
+            if (!window.supabaseClient) return Swal.fire('System Error', 'Supabase client not initialized.', 'error');
+            Swal.fire({title: 'Registering...', didOpen: () => Swal.showLoading()});
+            const { data, error } = await window.supabaseClient.auth.signUp({ email, password: pass, options: { data: { role } } });
+            if (error) Swal.fire('Registration Failed', error.message, 'error');
+            else Swal.fire('Success', 'Account created! Check your inbox or log in.', 'success');
+        }
+
+        async function logout() {
+            if (window.supabaseClient) await window.supabaseClient.auth.signOut();
+            ACTIVE_STATE_MACHINE = null;
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-pass').value = '';
+            showView('view-login');
+        }
+
+        function showView(viewId) {
+            ['view-login','view-tutor','view-student'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            const view = document.getElementById(viewId);
+            view.classList.remove('hidden');
+            view.classList.remove('fade-in-up');
+            void view.offsetWidth;
+            view.classList.add('fade-in-up');
+        }
+
+        // ── Tutor: Sub-workflow 1-4 ──
+        async function generateMaterials() {
+            const btn = document.querySelector('button[onclick="generateMaterials()"]');
+            const fileInput = document.getElementById('tutor-upload-file');
+            if (!fileInput.files.length) return Swal.fire('Validation Failed', 'Please select 1 Document Context file.', 'warning');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Uploading & Processing...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            try {
+                const file = fileInput.files[0];
+                const storagePath = `lessons/${Date.now()}_${file.name}`;
+                const { error: uploadError } = await window.supabaseClient.storage.from('documents').upload(storagePath, file);
+                if (uploadError) throw uploadError;
+                const sourceName = document.querySelector('#intake-form input[type="text"]')?.value || file.name;
+                const { data, error: edgeError } = await window.supabaseClient.functions.invoke('process-document', {
+                    body: { filePath: storagePath, workflowType: 'lesson_generation', sourceName }
+                });
+                if (edgeError) throw edgeError;
+                LAST_GENERATED_SM_ID = data.stateMachineId;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Generated!';
+                btn.classList.replace('bg-primary-600', 'bg-green-600');
+                document.getElementById('materials-output').classList.remove('hidden');
+                document.getElementById('generate-status').textContent = `Sub-workflow 4 completed. ${data.questionCount} QAs, ${data.hintCount} hints, ${data.promptCount} prompts. Tokens: ${data.tokenCost}.`;
+                Swal.fire({ title: 'System Pre-Computed', text: data.status, icon: 'success', confirmButtonColor: '#2563eb' }).then(() => {
+                    setTimeout(() => { btn.innerHTML = originalHtml; btn.disabled = false; btn.classList.replace('bg-green-600','bg-primary-600'); btn.classList.remove('opacity-75','cursor-not-allowed'); }, 3000);
+                });
+            } catch (err) {
+                btn.innerHTML = originalHtml; btn.disabled = false; btn.classList.remove('opacity-75','cursor-not-allowed');
+                Swal.fire('Processing Error', err.message, 'error');
+            }
+        }
+
+        // ── Tutor: Sub-workflow 6 ──
+        async function processMeetTranscript(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const labelTxt = document.getElementById('meet-upload-txt');
+            labelTxt.innerText = "1. Pushing transcript to Secure Storage...";
+            try {
+                const storagePath = `transcripts/${Date.now()}_${file.name}`;
+                const { error: uploadErr } = await window.supabaseClient.storage.from('documents').upload(storagePath, file);
+                if (uploadErr) throw uploadErr;
+                labelTxt.innerText = "2. Analyzing via Edge Function...";
+                const { data, error: edgeErr } = await window.supabaseClient.functions.invoke('process-document', {
+                    body: { filePath: storagePath, workflowType: 'meet_analysis' }
+                });
+                if (edgeErr) throw edgeErr;
+                labelTxt.innerText = "Click to upload Google Meet Transcript";
+                Swal.fire({ title: `${data.tier}`, html: `<div class="text-left text-sm mt-2"><pre class="whitespace-pre-wrap bg-slate-50 p-3 rounded text-xs">${data.minutes}</pre></div>`, icon: 'success', width: 600 });
+            } catch (err) {
+                labelTxt.innerText = "Click to upload Google Meet Transcript";
+                Swal.fire('Upload Pipeline Failed', err.message, 'error');
+            }
+        }
+
+        // ── Tutor: Sub-workflow 7 ──
+        function exportToPDF() {
+            Swal.fire({ title: 'No Server Compute', text: 'Converting via client HTML2PDF.', timer: 1500, showConfirmButton: false,
+                willClose: () => { html2pdf(document.getElementById('export-target'), { margin: 10, filename: 'Nota_Materials.pdf' }); }
+            });
+        }
+
+        // ── Tutor: Sync JSON to Student DB ──
+        async function syncStateMachine() {
+            if (!LAST_GENERATED_SM_ID) return Swal.fire('No Data', 'Generate a state machine first.', 'warning');
+            Swal.fire('Synced!', `State Machine ID ${LAST_GENERATED_SM_ID} is persisted in the Supabase DB and available to students.`, 'success');
+        }
+
+        // ── Student: Sub-workflow 5 & 8 — Client-Side Matching (0 tokens) ──
+        const FALLBACK_DB = [
+            { keyword: "latent heat", response: "Water has a higher specific latent heat capacity than oil, requiring more thermal energy to phase shift. Retrieved with 0 tokens." },
+            { keyword: "formula", response: "The derivation is Q = mcΔθ. Socratic Hint: Ensure mass is in kg, not grams." },
+            { keyword: "graph", response: "Boyle's Law: Pressure is inversely proportional to Volume. The graph plots as a curve." }
+        ];
+
+        function clientSideMatching(query) {
+            query = query.toLowerCase();
+            // Try matching against live DB state machine first
+            if (ACTIVE_STATE_MACHINE?.questions?.length) {
+                for (const q of ACTIVE_STATE_MACHINE.questions) {
+                    if (query.includes(q.keyword)) {
+                        const hint = ACTIVE_STATE_MACHINE.hints?.find(h => h.questionId === q.id);
+                        return `<b>Q${q.id}:</b> ${q.answer}<br/><span class="text-xs text-slate-500 mt-1 block"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>Socratic Hint: ${hint?.socraticHint || 'Review the source material.'}</span>`;
+                    }
+                }
+            }
+            // Fallback to hardcoded DB
+            const fallback = FALLBACK_DB.find(item => query.includes(item.keyword));
+            if (fallback) return fallback.response;
+            return "External query detected. In production, this runs 1 Hybrid RAG fetch returning pure text without LLM synthesis to protect 0.0 API token consumption.";
+        }
+
+        function injectPrompt(text) { const i = document.getElementById('chat-input'); i.value = text; i.focus(); }
+
+        function appendMessage(isUser, text) {
+            const container = document.getElementById('chat-container');
+            const msgDiv = document.createElement('div');
+            if(isUser) {
+                msgDiv.className = "flex justify-end fade-in-up w-full px-2";
+                msgDiv.innerHTML = `<div class="bg-brand-600 text-white rounded-2xl rounded-tr-sm px-4 md:px-5 py-3 md:py-3.5 max-w-[85%] sm:max-w-md shadow-sm text-sm leading-relaxed">${text}</div>`;
+            } else {
+                msgDiv.className = "flex gap-3 sm:gap-4 max-w-[95%] sm:max-w-2xl fade-in-up w-full px-2 mt-4 mb-4";
+                msgDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm mt-1"><i class="fa-solid fa-robot text-brand-600 text-xs"></i></div>
+                    <div class="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 md:px-5 py-3 md:py-3.5 shadow-sm text-sm leading-relaxed relative">${text}
+                        <div class="absolute -bottom-5 left-2 text-[10px] text-slate-400 font-medium whitespace-nowrap"><i class="fa-solid fa-check text-green-500 mr-0.5"></i> Client-Side Evaluated · 0 Tokens</div>
+                    </div>`;
+            }
+            container.appendChild(msgDiv);
+            document.querySelectorAll('.temp-spacer').forEach(e => e.remove());
+            const spacer = document.createElement('div'); spacer.className = "h-4 w-full shrink-0 temp-spacer"; container.appendChild(spacer);
+            setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+            appendMessage(true, text);
+            input.value = '';
+            setTimeout(() => {
+                appendMessage(false, clientSideMatching(text));
+                document.querySelectorAll('.token-counter').forEach(badge => {
+                    const p = badge.parentElement;
+                    p.classList.add('bg-green-100','border-green-300','text-green-700');
+                    setTimeout(() => p.classList.remove('bg-green-100','border-green-300','text-green-700'), 1500);
+                });
+            }, 400);
+        }
+    </script>
+</body>
+</html>

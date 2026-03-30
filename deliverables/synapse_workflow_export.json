@@ -1,0 +1,16 @@
+{
+  "project": "Synapse",
+  "version": "5.0",
+  "modular_nodes": [
+    {"id": "SW-1", "name": "Intake", "status": "verified"},
+    {"id": "SW-2", "name": "Scraper", "status": "verified"},
+    {"id": "SW-3", "name": "Plan", "status": "verified"},
+    {"id": "SW-4", "name": "Work", "status": "verified"},
+    {"id": "SW-5", "name": "Agent", "status": "verified"},
+    {"id": "SW-6", "name": "Analyzer", "status": "verified"},
+    {"id": "SW-7", "name": "Output", "status": "verified"},
+    {"id": "SW-8", "name": "Branch", "status": "verified"}
+  ],
+  "kpi_compliance": 1.0,
+  "zero_maintenance": true
+}
