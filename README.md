@@ -53,3 +53,14 @@ Navigate to `http://localhost:5173` to view the authenticated gateway.
 - **Student Token Consumption:** 0 API calls required. All client-matching is bounded inside the local JSON mapping framework.
 - **Node Dependency:** Eliminated. Replaced natively by Vite. 
 - **Security Check:** Validated. All keys are isolated in local memory without exposing to GitHub or generic frontend caches.
+
+## 5. AXELO Governance & Documentation
+This project complies with Phase 5 (Deployment) of the AXELO framework.
+- **System Status:** [status.md](status.md)
+- **Architecture Manual:** [docs/architecture_manual.md](docs/architecture_manual.md)
+- **Operations Manual:** [docs/operations_manual.md](docs/operations_manual.md)
+- **Test Cases:** [docs/test_cases.md](docs/test_cases.md)
+- **Handover Brief:** [docs/handover_brief.md](docs/handover_brief.md)
+- **Progress Plan:** [docs/progress_plan.md](docs/progress_plan.md)
+
+*AXELO — Designed to outlive its creator.*
